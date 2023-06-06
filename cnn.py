@@ -192,8 +192,6 @@ if __name__ == "__main__":
 
 
     outputs = apply_conv_layers(bengio_img,layers)
-    # for output in outputs:
-        # print(output.shape)
     plot_outputs(outputs=outputs)
 
 
