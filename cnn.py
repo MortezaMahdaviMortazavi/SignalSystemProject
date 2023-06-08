@@ -79,6 +79,21 @@ def apply_conv_layers(img,
 
     return outputs
 
+
+def plot_channels(output):
+    channels = output.shape[2]
+    fig , axes = plt.subplots(1,channels+1,figsize=(12,3))
+    for idx in range(channels):
+        axes[idx].imshow(output[:,:,idx],cmap='gray')
+        axes[idx].axis('off')
+
+    # axes[channels].imshow(output[:,:,:])
+    plt.tight_layout()
+    plt.show()
+
+
+        
+
 def plot_outputs(outputs):
     num_outputs = len(outputs)
     fig, axes = plt.subplots(1, num_outputs, figsize=(12, 3))  # Adjust the figsize as per your preference
@@ -98,6 +113,8 @@ def plot_outputs(outputs):
                 pass
 
         axes[i].axis('off')
+    
+    axes
 
     plt.tight_layout()
     plt.show()
@@ -192,6 +209,8 @@ if __name__ == "__main__":
 
 
     outputs = apply_conv_layers(bengio_img,layers)
-    plot_outputs(outputs=outputs)
+    last_output = outputs[3]
+    # print(last_output.shape)
+    plot_channels(last_output)
 
 

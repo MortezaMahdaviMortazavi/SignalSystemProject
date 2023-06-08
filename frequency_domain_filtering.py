@@ -6,18 +6,19 @@ from PIL import Image
 from tqdm import tqdm
 from cnn import apply_conv_layers
 
+
 def fourier_transform(inp):
     fourier = np.fft.fft2(inp)
     fourier_shifted = np.fft.fftshift(fourier)
     magnitude_spectrum = np.abs(fourier_shifted)
-    # phase = np.angle(fourier_shifted)
+    phase = np.angle(fourier_shifted)
     phase_spectrum = np.angle(fourier_shifted)
-    return magnitude_spectrum,phase_spectrum
+    return magnitude_spectrum,phase
 
 def apply_fourier_transform(outputs):
     filters_ft_output = []
     for output in outputs:
-        out_magn,out_phase = fourier_transform(outputs)
+        out_magn,out_phase = fourier_transform(output)
         filters_ft_output.append(
             {
                 'original':output,
@@ -33,7 +34,7 @@ def plot_magnitude_and_phase(outputs):
     num_items = len(outputs)
 
     # Create subplots
-    fig, axes = plt.subplots(num_items, 2, figsize=(10, 5*num_items))
+    fig, axes = plt.subplots(num_items, 2, figsize=(8, 4*num_items))
     fig.tight_layout()
 
     # Iterate over each item in the outputs list
@@ -58,11 +59,24 @@ def plot_magnitude_and_phase(outputs):
 
 if __name__ == '__main__':
     # Load the image
-    bengio = np.array(cv.imread('images/bengio.jpg'))
-    goodfellaw = np.array(cv.imread('images/goodfellaw.png'))
-    hinton = np.array(cv.imread('images/hinton.jpg'))
-    lecun = np.array(cv.imread('images/lecun.jpg'))
+    bengio = Image.open('images/bengio.jpg')
+    bengio = bengio.convert("L") # grayscale
+    goodfellow = Image.open('images/goodfellow.png')
+    goodfellow = goodfellow.convert("L") # grayscale
+    hinton = Image.open('images/hinton.jpg')
+    hinton = hinton.convert("L")
+    lecun = Image.open('images/lecun.jpg')
+    lecun = lecun.convert("L")
 
+    bengio = np.array(bengio)
+    goodfellow = np.array(goodfellow)
+    hinton = np.array(hinton)
+    lecun = np.array(lecun)
+
+    bengio = bengio.reshape(bengio.shape[0],bengio.shape[1],1)
+    goodfellow = goodfellow.reshape(goodfellow.shape[0],goodfellow.shape[1],1)
+    hinton = hinton.reshape(hinton.shape[0],hinton.shape[1],1)
+    lecun = lecun.reshape(lecun.shape[0],lecun.shape[1],1)
 
     """Layer 1"""
     bottem_sobel = np.array([
@@ -138,8 +152,9 @@ if __name__ == '__main__':
         {'filters':l1_filters,'stride':1,'padding':'same'},
         {'filters':l1_weighted_average,"stride":1,'padding':'same'},
         {'filters':l2_filters,"stride":2,'padding':'valid'},
-        {'filters':l3_filters,"stride":1,'padding':'same'},
+        # {'filters':l3_filters,"stride":1,'padding':'same'},
     ]
     outputs = apply_conv_layers(bengio,layers)
+    
     apply_fourier_transform_outputs = apply_fourier_transform(outputs)
     plot_magnitude_and_phase(apply_fourier_transform_outputs)
